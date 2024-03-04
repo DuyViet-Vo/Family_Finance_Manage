@@ -1,3 +1,5 @@
+# main.py
+
 from flask import Flask
 from config.settings import SWAGGER_SETTINGS, SQLALCHEMY_DATABASE_URI
 from models import db
