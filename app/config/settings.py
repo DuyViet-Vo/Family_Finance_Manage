@@ -34,4 +34,4 @@ SWAGGER_SETTINGS = {
     }
 }
 
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:vdv1810@localhost/test'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:vdv1810@localhost/finance_manage'
