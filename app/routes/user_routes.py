@@ -1,10 +1,9 @@
 from flask import Blueprint, request, jsonify
 from models import db
 from models.user import User
-from sqlalchemy.exc import IntegrityError
-from itsdangerous import Serializer
 import hashlib
-import time
+import jwt
+from datetime import datetime, timedelta
 from config.settings import SECRET_KEY
 
 user_bp = Blueprint('users', __name__)
@@ -71,7 +70,7 @@ def register():
     responses:
       200:
         description: Người dùng đã được tạo thành công.
-    """
+  """
   data = request.get_json()
   
   if User.query.filter_by(email=data['email']).first() is not None:
@@ -85,3 +84,49 @@ def register():
   db.session.add(new_user)
   db.session.commit()
   return jsonify({'message': 'User registered successfully'}), 201
+
+
+@user_bp.route('/login', methods=['POST'])
+def login():
+  """
+    Người dùng đăng nhập.
+    ---
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: User
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+              description: Địa chỉ email của người dùng.
+            password:
+              type: string
+              description: Mật khẩu người dùng
+    responses:
+      200:
+        description: Người dùng đăng nhập thành công.
+  """
+  data = request.get_json()
+  email = data.get('email')
+  password = data.get('password')
+
+  if not email or not password:
+      return jsonify({'message': 'Missing email or password'}), 400
+
+  user = User.query.filter_by(email=email).first()
+
+  if not user or user.password != hashlib.md5(password.encode()).hexdigest():
+      return jsonify({'message': 'Invalid email or password'}), 401
+
+  # Create access token
+  access_token = jwt.encode({'email': email, 'exp': datetime.utcnow() + timedelta(minutes=60)}, SECRET_KEY)
+
+  # Create refresh token
+  refresh_token = jwt.encode({'email': email, 'exp': datetime.utcnow() + timedelta(days=7)}, SECRET_KEY)
+
+  return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
