@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
+
 from models import db
 from models.group import Group
 
-group_db = Blueprint('groups', __name__)
+group_db = Blueprint("groups", __name__)
 
-@group_db.route('/groups', methods=['GET'])
+
+@group_db.route("/groups", methods=["GET"])
 def get_groups():
     """
     Lấy danh sách tất cả nhóm với thông tin người tạo nhóm.
@@ -17,20 +19,20 @@ def get_groups():
     output = []
     for group in groups:
         group_data = {
-            'id': group.id, 
-            'group_name': group.group_name, 
-            'user_create': {
-                'id': group.creator.id,
-                'username': group.creator.username,
-                'email': group.creator.email
+            "id": group.id,
+            "group_name": group.group_name,
+            "user_create": {
+                "id": group.creator.id,
+                "username": group.creator.username,
+                "email": group.creator.email,
             },
-            'created_at': group.created_at
+            "created_at": group.created_at,
         }
         output.append(group_data)
-    return jsonify({'groups': output})
+    return jsonify({"groups": output})
 
 
-@group_db.route('/groups/<int:group_id>', methods=['GET'])
+@group_db.route("/groups/<int:group_id>", methods=["GET"])
 def get_group(group_id):
     """
     Lấy thông tin của một nhóm dựa trên ID với thông tin người tạo nhóm.
@@ -46,18 +48,19 @@ def get_group(group_id):
     """
     group = Group.query.get_or_404(group_id)
     group_data = {
-        'id': group.id,
-        'group_name': group.group_name,
-        'user_create': {
-            'id': group.creator.id,
-            'username': group.creator.username,
-            'email': group.creator.email
+        "id": group.id,
+        "group_name": group.group_name,
+        "user_create": {
+            "id": group.creator.id,
+            "username": group.creator.username,
+            "email": group.creator.email,
         },
-        'created_at': group.created_at
+        "created_at": group.created_at,
     }
     return jsonify(group_data)
 
-@group_db.route('/groups', methods=['POST'])
+
+@group_db.route("/groups", methods=["POST"])
 def create_group():
     """
     Tạo mới một nhóm.
@@ -83,12 +86,15 @@ def create_group():
         description: Nhóm đã được tạo thành công.
     """
     data = request.json
-    new_group = Group(group_name=data['group_name'], user_create=data['user_create'])
+    new_group = Group(
+        group_name=data["group_name"], user_create=data["user_create"]
+    )
     db.session.add(new_group)
     db.session.commit()
-    return jsonify({'message': 'Group created successfully!'})
+    return jsonify({"message": "Group created successfully!"})
 
-@group_db.route('/groups/<int:group_id>', methods=['PUT'])
+
+@group_db.route("/groups/<int:group_id>", methods=["PUT"])
 def update_group(group_id):
     """
     Cập nhật thông tin của một nhóm.
@@ -113,12 +119,12 @@ def update_group(group_id):
     """
     group = Group.query.get_or_404(group_id)
     data = request.json
-    group.group_name = data['group_name']
+    group.group_name = data["group_name"]
     db.session.commit()
-    return jsonify({'message': 'Group updated successfully!'})
+    return jsonify({"message": "Group updated successfully!"})
 
-    
-@group_db.route('/groups/<int:group_id>', methods=['DELETE'])
+
+@group_db.route("/groups/<int:group_id>", methods=["DELETE"])
 def delete_group(group_id):
     """
     Xóa một nhóm.
@@ -135,4 +141,4 @@ def delete_group(group_id):
     group = Group.query.get_or_404(group_id)
     db.session.delete(group)
     db.session.commit()
-    return jsonify({'message': 'Group deleted successfully!'})
+    return jsonify({"message": "Group deleted successfully!"})

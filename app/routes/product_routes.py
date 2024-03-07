@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
+
 from models import db
 from models.product import Product
 
-product_bp = Blueprint('products', __name__)
+product_bp = Blueprint("products", __name__)
 
-@product_bp.route('/products', methods=['GET'])
+
+@product_bp.route("/products", methods=["GET"])
 def get_products():
     """
     Lấy danh sách tất cả sản phẩm.
@@ -16,11 +18,17 @@ def get_products():
     products = Product.query.all()
     output = []
     for product in products:
-        product_data = {'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price}
+        product_data = {
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+            "price": product.price,
+        }
         output.append(product_data)
-    return jsonify({'products': output})
+    return jsonify({"products": output})
 
-@product_bp.route('/products/<int:product_id>', methods=['GET'])
+
+@product_bp.route("/products/<int:product_id>", methods=["GET"])
 def get_product(product_id):
     """
     Lấy thông tin của một sản phẩm dựa trên ID.
@@ -35,9 +43,17 @@ def get_product(product_id):
         description: Thông tin của sản phẩm.
     """
     product = Product.query.get_or_404(product_id)
-    return jsonify({'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price})
+    return jsonify(
+        {
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+            "price": product.price,
+        }
+    )
 
-@product_bp.route('/products', methods=['POST'])
+
+@product_bp.route("/products", methods=["POST"])
 def create_product():
     """
     Tạo mới một sản phẩm.
@@ -67,12 +83,15 @@ def create_product():
         description: Sản phẩm đã được tạo thành công.
     """
     data = request.json
-    new_product = Product(name=data['name'], description=data['description'], price=data['price'])
+    new_product = Product(
+        name=data["name"], description=data["description"], price=data["price"]
+    )
     db.session.add(new_product)
     db.session.commit()
-    return jsonify({'message': 'Product created successfully!'})
+    return jsonify({"message": "Product created successfully!"})
 
-@product_bp.route('/products/<int:product_id>', methods=['PUT'])
+
+@product_bp.route("/products/<int:product_id>", methods=["PUT"])
 def update_product(product_id):
     """
     Cập nhật thông tin của một sản phẩm.
@@ -103,13 +122,14 @@ def update_product(product_id):
     """
     product = Product.query.get_or_404(product_id)
     data = request.json
-    product.name = data['name']
-    product.description = data['description']
-    product.price = data['price']
+    product.name = data["name"]
+    product.description = data["description"]
+    product.price = data["price"]
     db.session.commit()
-    return jsonify({'message': 'Product updated successfully!'})
+    return jsonify({"message": "Product updated successfully!"})
 
-@product_bp.route('/products/<int:product_id>', methods=['DELETE'])
+
+@product_bp.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
     """
     Xóa một sản phẩm.
@@ -126,4 +146,4 @@ def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     db.session.delete(product)
     db.session.commit()
-    return jsonify({'message': 'Product deleted successfully!'})
+    return jsonify({"message": "Product deleted successfully!"})
