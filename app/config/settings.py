@@ -35,3 +35,4 @@ SWAGGER_SETTINGS = {
 }
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:vdv1810@localhost/finance_manage'
+SECRET_KEY = 'duyvietvo1810'

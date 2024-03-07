@@ -2,6 +2,10 @@ from flask import Blueprint, request, jsonify
 from models import db
 from models.user import User
 from sqlalchemy.exc import IntegrityError
+from itsdangerous import Serializer
+import hashlib
+import time
+from config.settings import SECRET_KEY
 
 user_bp = Blueprint('users', __name__)
 
@@ -69,14 +73,15 @@ def register():
         description: Người dùng đã được tạo thành công.
     """
   data = request.get_json()
-  new_user = User(username=data['username'], password=data['password'], email=data['email'])
-  try:
-      db.session.add(new_user)
-      db.session.commit()
-      return jsonify({'message': 'User created successfully'}), 201
-  except IntegrityError:
-      db.session.rollback()
-      return jsonify({'message': 'Username or email already exists'}), 400
-
-
-
+  
+  if User.query.filter_by(email=data['email']).first() is not None:
+    return jsonify({'message': 'Email already exists'}), 400
+  if User.query.filter_by(username=data['username']).first() is not None:
+    return jsonify({'message': 'Username already exists'}), 400
+  # Mã hoá mật khẩu thành MD5
+  password = data['password']
+  hashed_password = hashlib.md5(password.encode()).hexdigest()
+  new_user = User(username=data['username'], password=hashed_password, email=data['email'])
+  db.session.add(new_user)
+  db.session.commit()
+  return jsonify({'message': 'User registered successfully'}), 201

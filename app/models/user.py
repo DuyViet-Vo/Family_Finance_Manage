@@ -11,5 +11,5 @@ class User(db.Model):
     groups = db.relationship('Group', backref='creator', lazy=True)
 
 
-    def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
+    # def __repr__(self):
+    #     return f"User('{self.username}', '{self.email}')"

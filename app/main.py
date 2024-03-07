@@ -1,7 +1,7 @@
 # main.py
 
 from flask import Flask
-from config.settings import SWAGGER_SETTINGS, SQLALCHEMY_DATABASE_URI
+from config.settings import SWAGGER_SETTINGS, SQLALCHEMY_DATABASE_URI, SECRET_KEY
 from models import db
 from routes.user_routes import user_bp
 from routes.product_routes import product_bp
@@ -13,6 +13,7 @@ def create_app():
     app = Flask(__name__)
     app.config.update(SWAGGER_SETTINGS)
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+    app.config['SECRET_KEY'] = SECRET_KEY
 
     db.init_app(app)
     migrate = Migrate(app, db)  # Thêm dòng này để khởi tạo Flask-Migrate
