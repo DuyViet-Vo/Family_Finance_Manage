@@ -8,6 +8,7 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    groups = db.relationship('Group', backref='creator', lazy=True)
 
 
     def __repr__(self):
